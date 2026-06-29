@@ -51,7 +51,7 @@ class ResearchRequest(BaseModel):
     )
     url: Optional[str] = Field(
         default=None,
-        description="Company website or LinkedIn URL (optional but improves research quality).",
+        description="Company website or LinkedIn URL (optional).",
         examples=["https://stripe.com"],
     )
     extra_context: Optional[str] = Field(
