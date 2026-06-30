@@ -36,27 +36,39 @@ COLUMN_ALIASES: dict[str, list[str]] = {
 PEOPLE_COLUMN_ALIASES: dict[str, list[str]] = {
     "person":    ["full_name", "name", "person_name", "founder_name", "person"],
     "role":      ["title", "job_title", "role", "position", "designation"],
-    "company":   ["company_name", "organization_name", "employer", "startup", "company"],
-    "location":  ["city", "region", "country", "location", "geography"],
+    "company":   ["company_name", "organization_name", "employer", "startup", "company", "affiliation_name"],
+    "location":  ["city", "region", "country", "location", "geography", "birthplace"],
     "education": ["school", "university", "degree", "alma_mater", "education", "institution"],
 }
 
 
 def _normalise_columns(df: pd.DataFrame, aliases: dict[str, list[str]]) -> pd.DataFrame:
-    """Rename dataset-specific columns to canonical names."""
+    """Rename dataset-specific columns to canonical names.
+
+    IMPORTANT: this only RENAMES columns it finds — it never drops or merges
+    columns, so it cannot itself cause row loss. Each canonical key is mapped
+    to at most one source column (first alias match wins).
+    """
     rename_map: dict[str, str] = {}
+    used_source_cols: set[str] = set()
     lowered = {c.lower(): c for c in df.columns}
+
     for canonical, alias_list in aliases.items():
-        if canonical not in lowered:
-            for alias in alias_list:
-                if alias.lower() in lowered:
-                    rename_map[lowered[alias.lower()]] = canonical
-                    break
+        if canonical in df.columns:
+            # Already has the canonical name — leave it alone.
+            continue
+        for alias in alias_list:
+            source_col = lowered.get(alias.lower())
+            if source_col and source_col not in used_source_cols:
+                rename_map[source_col] = canonical
+                used_source_cols.add(source_col)
+                break
+
     return df.rename(columns=rename_map)
 
 
 def _read_csv_with_fallback(path: str) -> tuple[pd.DataFrame, str]:
-    """Read a CSV using a small set of encodings commonly seen in raw exports."""
+    """Read CSV using a small set of encodings commonly seen in exports."""
     last_error: UnicodeDecodeError | None = None
 
     for encoding in CSV_ENCODINGS:
@@ -72,19 +84,19 @@ def _read_csv_with_fallback(path: str) -> tuple[pd.DataFrame, str]:
 
 
 def _load_csv(path: str, label: str) -> pd.DataFrame:
-    """Load a CSV, normalise columns, clean nulls and duplicates."""
+    """Load a CSV. NOTE: does NOT drop duplicates here — that decision is
+    made later, per-dataset, so we can clearly log row-count impact."""
     if not os.path.exists(path):
         logger.warning(f"[{label}] File not found at '{path}' — skipping.")
         return pd.DataFrame()
 
-    logger.info(f"[{label}] Loading '{path}' …")
+    logger.info(f"[{label}] Loading '{path}' ...")
     df, encoding = _read_csv_with_fallback(path)
     logger.info(f"[{label}] Loaded using encoding: {encoding}")
-    logger.info(f"[{label}] Raw rows: {len(df):,}  |  columns: {list(df.columns)}")
+    logger.info(f"[{label}] Raw rows: {len(df):,} | columns: {list(df.columns)}")
 
     df = df.dropna(how="all")
-    df = df.drop_duplicates()
-    logger.info(f"[{label}] After clean: {len(df):,} rows")
+    logger.info(f"[{label}] After dropping fully-empty rows: {len(df):,} rows")
     return df
 
 
@@ -98,24 +110,6 @@ def _extract_year(val) -> str:
     return s
 
 
-def _format_investor_names(investors: str) -> str:
-    """Return a short investor summary for chunk text."""
-    if not investors or investors.lower() == "nan":
-        return "unknown investors"
-
-    parts = [part.strip() for part in investors.replace(";", ",").split(",") if part.strip()]
-    if not parts:
-        return "unknown investors"
-
-    if len(parts) == 1:
-        return parts[0]
-
-    if len(parts) == 2:
-        return f"{parts[0]} and {parts[1]}"
-
-    return f"{parts[0]}, {parts[1]}, and {len(parts) - 2} others"
-
-
 def _row_to_funding_chunk(row: pd.Series) -> str:
     """Convert one funding DataFrame row into a human-readable text chunk."""
     company       = str(row.get("company",       "Unknown")).strip()
@@ -123,7 +117,6 @@ def _row_to_funding_chunk(row: pd.Series) -> str:
     funding_round = str(row.get("funding_round", "Unknown")).strip()
     investors     = str(row.get("investors",     "Unknown")).strip()
     year          = _extract_year(row.get("year", "N/A"))
-    investor_text = _format_investor_names(investors)
 
     raw_amount = row.get("amount_usd", None)
     try:
@@ -138,15 +131,24 @@ def _row_to_funding_chunk(row: pd.Series) -> str:
         amount_str = str(raw_amount) if raw_amount and str(raw_amount) != "nan" else "N/A"
 
     return (
-        f"Company: {company} is a startup in the {sector} sector that raised {amount_str} "
-        f"in {year} during a {funding_round} round from investors including {investor_text}. "
-        f"This company operates in the {sector} industry."
+        f"Company: {company} | "
+        f"Sector: {sector} | "
+        f"Funding Round: {funding_round} | "
+        f"Amount: {amount_str} | "
+        f"Investors: {investors} | "
+        f"Year: {year}"
     )
 
 
 def _row_to_people_chunk(row: pd.Series) -> str:
     """Convert one people DataFrame row into a human-readable text chunk."""
-    person    = str(row.get("person",    "Unknown")).strip()
+    # 'person' may not exist as a single column if first/last name are split.
+    person = str(row.get("person", "")).strip()
+    if not person or person.lower() == "nan":
+        first = str(row.get("first_name", "")).strip()
+        last  = str(row.get("last_name", "")).strip()
+        person = f"{first} {last}".strip() or "Unknown"
+
     role      = str(row.get("role",      "Unknown")).strip()
     company   = str(row.get("company",   "Unknown")).strip()
     location  = str(row.get("location",  "Unknown")).strip()
@@ -163,40 +165,49 @@ def _row_to_people_chunk(row: pd.Series) -> str:
 
 def _embed_and_store(
     chunks: list[str],
+    label: str,
     model: SentenceTransformer,
     collection: chromadb.Collection,
 ) -> int:
     """Embed chunks in batches and upsert into ChromaDB. Returns count stored."""
     total = len(chunks)
-    stored = 0
+    if total == 0:
+        logger.warning(f"[{label}] No chunks to embed — skipping.")
+        return 0
 
+    stored = 0
     for start in range(0, total, BATCH_SIZE):
-        batch = chunks[start : start + BATCH_SIZE]
-        ids   = [str(uuid.uuid4()) for _ in batch]
+        batch = chunks[start: start + BATCH_SIZE]
+        ids = [str(uuid.uuid4()) for _ in batch]
 
         logger.debug(
-            f"Embedding batch {start // BATCH_SIZE + 1} "
-            f"({start}–{min(start + BATCH_SIZE, total)} / {total}) …"
+            f"[{label}] Embedding batch {start // BATCH_SIZE + 1} "
+            f"({start}-{min(start + BATCH_SIZE, total)} / {total}) ..."
         )
 
         embeddings = model.encode(batch, show_progress_bar=False).tolist()
-        collection.upsert(
-            ids=ids,
-            embeddings=embeddings,
-            documents=batch,
-        )
-        stored += len(batch)
 
+        try:
+            collection.upsert(
+                ids=ids,
+                embeddings=embeddings,
+                documents=batch,
+            )
+            stored += len(batch)
+        except Exception as e:
+            logger.error(f"[{label}] ChromaDB upsert FAILED for batch at offset {start}: {e}")
+
+    logger.success(f"[{label}] Stored {stored:,} / {total:,} chunks")
     return stored
 
 
 def run_ingestion() -> None:
-    """Full ingestion pipeline: load → clean → chunk → embed → store."""
-    logger.info("═" * 60)
-    logger.info("  Orion Alpha — Data Ingestion Pipeline")
-    logger.info("═" * 60)
+    """Full ingestion pipeline: load -> clean -> chunk -> embed -> store."""
+    logger.info("=" * 60)
+    logger.info("  Vektor — Data Ingestion Pipeline")
+    logger.info("=" * 60)
 
-    # ── 1. Load funding CSVs ──────────────────────────────────────────────────
+    # ── 1. Load funding CSVs (independently, before any merging) ─────────────
     cb_df = _load_csv(CRUNCHBASE_CSV_PATH, "Crunchbase")
     vc_df = _load_csv(VC_FUNDING_CSV_PATH, "VC Funding")
 
@@ -204,46 +215,67 @@ def run_ingestion() -> None:
         logger.error("Both funding CSVs failed to load. Aborting ingestion.")
         return
 
-    # Normalise funding columns
+    # Normalise funding columns (rename only — no row loss possible here)
     if not cb_df.empty:
         cb_df = _normalise_columns(cb_df, COLUMN_ALIASES)
     if not vc_df.empty:
         vc_df = _normalise_columns(vc_df, COLUMN_ALIASES)
 
-    # ── 2. Combine funding datasets ───────────────────────────────────────────
-    funding_frames = [df for df in [cb_df, vc_df] if not df.empty]
-    combined_df = pd.concat(funding_frames, ignore_index=True).drop_duplicates()
-    logger.info(f"Combined funding dataset: {len(combined_df):,} rows")
+    print(f"[DEBUG] Crunchbase rows after normalise: {len(cb_df):,}")
+    print(f"[DEBUG] VC Funding rows after normalise: {len(vc_df):,}")
 
-    # ── 3. Chunk funding rows ─────────────────────────────────────────────────
-    logger.info("Building text chunks from funding rows …")
-    funding_chunks = [_row_to_funding_chunk(row) for _, row in combined_df.iterrows()]
-    logger.info(f"Funding chunks: {len(funding_chunks):,}")
+    # ── 2. Chunk EACH funding dataset SEPARATELY (no cross-dataset dedup) ─────
+    # We deliberately do NOT concat + drop_duplicates across the two datasets,
+    # since that was the likely cause of mass row loss (rows with similar
+    # values in only a few overlapping columns were being treated as dupes).
+    funding_chunks: list[str] = []
 
-    # ── 4. Load people.csv ────────────────────────────────────────────────────
-    logger.info("Loading people.csv …")
+    if not cb_df.empty:
+        cb_chunks = [_row_to_funding_chunk(row) for _, row in cb_df.iterrows()]
+        print(f"[DEBUG] Crunchbase chunks created: {len(cb_chunks):,}")
+        funding_chunks.extend(cb_chunks)
+
+    if not vc_df.empty:
+        vc_chunks = [_row_to_funding_chunk(row) for _, row in vc_df.iterrows()]
+        print(f"[DEBUG] VC Funding chunks created: {len(vc_chunks):,}")
+        funding_chunks.extend(vc_chunks)
+
+    # Only dedupe EXACT identical chunk strings (safe — true duplicates only)
+    before_dedup = len(funding_chunks)
+    funding_chunks = list(dict.fromkeys(funding_chunks))
+    logger.info(
+        f"Funding chunks: {before_dedup:,} before exact-dedup -> "
+        f"{len(funding_chunks):,} after"
+    )
+
+    # ── 3. Load + chunk people.csv ─────────────────────────────────────────────
     people_df = _load_csv(PEOPLE_CSV_PATH, "People")
+    print(f"[DEBUG] people.csv rows loaded: {len(people_df):,}")
+
     people_chunks: list[str] = []
 
     if not people_df.empty:
         people_df = _normalise_columns(people_df, PEOPLE_COLUMN_ALIASES)
         people_chunks = [_row_to_people_chunk(row) for _, row in people_df.iterrows()]
-        logger.info(f"People chunks: {len(people_chunks):,}")
+
+        before_dedup_p = len(people_chunks)
+        people_chunks = list(dict.fromkeys(people_chunks))
+
+        print(f"[DEBUG] People chunks created: {before_dedup_p:,} -> {len(people_chunks):,} after exact-dedup")
+        print("[DEBUG] First 3 people chunks:")
+        for i, chunk in enumerate(people_chunks[:3]):
+            print(f"  {i + 1}. {chunk}")
     else:
         logger.warning("people.csv not loaded — founder/team data will not be indexed.")
 
-    # ── 5. Combine all chunks ─────────────────────────────────────────────────
-    all_chunks = funding_chunks + people_chunks
-    logger.info(f"Total chunks to embed: {len(all_chunks):,}")
-
-    # ── 6. Load embedding model ───────────────────────────────────────────────
-    logger.info(f"Loading embedding model: '{EMBEDDING_MODEL}' …")
+    # ── 4. Load embedding model ────────────────────────────────────────────────
+    logger.info(f"Loading embedding model: '{EMBEDDING_MODEL}' ...")
     embed_model = SentenceTransformer(EMBEDDING_MODEL)
     logger.info("Embedding model ready.")
 
-    # ── 7. Init ChromaDB ──────────────────────────────────────────────────────
+    # ── 5. Init ChromaDB (fresh collection — old folder contents already deleted) ─
     os.makedirs(CHROMA_PERSIST_DIR, exist_ok=True)
-    logger.info(f"Initialising ChromaDB at '{CHROMA_PERSIST_DIR}' …")
+    logger.info(f"Initialising ChromaDB at '{CHROMA_PERSIST_DIR}' ...")
     chroma_client = chromadb.PersistentClient(
         path=CHROMA_PERSIST_DIR,
         settings=Settings(anonymized_telemetry=False),
@@ -252,20 +284,34 @@ def run_ingestion() -> None:
         name=CHROMA_COLLECTION,
         metadata={"hnsw:space": "cosine"},
     )
-    logger.info(f"Collection '{CHROMA_COLLECTION}' ready.")
-
-    # ── 8. Embed + store all chunks ───────────────────────────────────────────
-    logger.info("Embedding and storing all chunks …")
-    stored_count = _embed_and_store(all_chunks, embed_model, collection)
-
-    # ── 9. Done ───────────────────────────────────────────────────────────────
-    logger.info("═" * 60)
-    print(
-        f"Ingestion complete. {stored_count:,} documents indexed. "
-        f"(includes founder/people data)"
+    logger.info(
+        f"Collection '{CHROMA_COLLECTION}' ready — "
+        f"documents before this run: {collection.count():,}"
     )
-    logger.info(f"ChromaDB persisted → '{CHROMA_PERSIST_DIR}'")
-    logger.info("═" * 60)
+
+    # ── 6. Embed + store funding chunks ────────────────────────────────────────
+    logger.info("Embedding and storing funding chunks ...")
+    funding_stored = _embed_and_store(funding_chunks, "Funding", embed_model, collection)
+
+    # ── 7. Embed + store people chunks (same collection) ──────────────────────
+    logger.info("Embedding and storing people chunks ...")
+    people_stored = _embed_and_store(people_chunks, "People", embed_model, collection)
+
+    # ── 8. Final counts ─────────────────────────────────────────────────────────
+    total_stored = funding_stored + people_stored
+    logger.info("=" * 60)
+    print(
+        f"Funding chunks: {funding_stored:,}, "
+        f"People chunks: {people_stored:,}, "
+        f"Total stored this run: {total_stored:,}"
+    )
+    print(f"Final ChromaDB collection count: {collection.count():,}")
+    print(
+        f"Ingestion complete. {total_stored:,} documents indexed this run "
+        f"(includes founder/people data)."
+    )
+    logger.info(f"ChromaDB persisted -> '{CHROMA_PERSIST_DIR}'")
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":
