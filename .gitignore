@@ -44,3 +44,16 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Node / Frontend
+node_modules/
+package-lock.json
+
+# UV lock file
+uv.lock
+
+# Processed data
+data/processed/
+
+# Agent config
+.agents/
