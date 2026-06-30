@@ -98,6 +98,24 @@ def _extract_year(val) -> str:
     return s
 
 
+def _format_investor_names(investors: str) -> str:
+    """Return a short investor summary for chunk text."""
+    if not investors or investors.lower() == "nan":
+        return "unknown investors"
+
+    parts = [part.strip() for part in investors.replace(";", ",").split(",") if part.strip()]
+    if not parts:
+        return "unknown investors"
+
+    if len(parts) == 1:
+        return parts[0]
+
+    if len(parts) == 2:
+        return f"{parts[0]} and {parts[1]}"
+
+    return f"{parts[0]}, {parts[1]}, and {len(parts) - 2} others"
+
+
 def _row_to_funding_chunk(row: pd.Series) -> str:
     """Convert one funding DataFrame row into a human-readable text chunk."""
     company       = str(row.get("company",       "Unknown")).strip()
@@ -105,6 +123,7 @@ def _row_to_funding_chunk(row: pd.Series) -> str:
     funding_round = str(row.get("funding_round", "Unknown")).strip()
     investors     = str(row.get("investors",     "Unknown")).strip()
     year          = _extract_year(row.get("year", "N/A"))
+    investor_text = _format_investor_names(investors)
 
     raw_amount = row.get("amount_usd", None)
     try:
@@ -119,12 +138,9 @@ def _row_to_funding_chunk(row: pd.Series) -> str:
         amount_str = str(raw_amount) if raw_amount and str(raw_amount) != "nan" else "N/A"
 
     return (
-        f"Company: {company} | "
-        f"Sector: {sector} | "
-        f"Funding Round: {funding_round} | "
-        f"Amount: {amount_str} | "
-        f"Investors: {investors} | "
-        f"Year: {year}"
+        f"Company: {company} is a startup in the {sector} sector that raised {amount_str} "
+        f"in {year} during a {funding_round} round from investors including {investor_text}. "
+        f"This company operates in the {sector} industry."
     )
 
 
