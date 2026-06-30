@@ -127,7 +127,7 @@ def research_founder(company_name: str) -> str:
 
     # --- Step 1: Tavily web search ---
     search_query = (
-        f"{company_name} founder background LinkedIn co-founder"
+        f"{company_name} founder co-founder CEO background experience startup"
     )
     logger.debug(f"[founder_tool] Tavily query: '{search_query}'")
     web_results = _tavily_search(search_query)

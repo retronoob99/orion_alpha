@@ -6,12 +6,9 @@ import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
-from langchain.agents import create_agent          # LangChain 1.3+ unified API
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from langchain_groq import ChatGroq
 from loguru import logger
 
 # ── 6 research tools ──────────────────────────────────────────────────────────
@@ -21,6 +18,7 @@ from agent.tools.financials_tool import research_financials
 from agent.tools.market_tool     import research_market
 from agent.tools.macro_tool      import research_macro_conditions
 from agent.tools.news_tool       import research_news
+from scorer.recommendation import generate_recommendation
 
 load_dotenv()
 
@@ -119,6 +117,14 @@ def _load_prompt_file(filename: str, fallback: str) -> str:
     return fallback
 
 
+def _truncate_text(text: str, max_chars: int = 1800) -> str:
+    """Keep tool output compact so downstream scoring stays within model limits."""
+    cleaned = (text or "").strip()
+    if len(cleaned) <= max_chars:
+        return cleaned
+    return cleaned[:max_chars].rstrip() + "\n... [truncated]"
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # TOOLS LIST
 # ─────────────────────────────────────────────────────────────────────────────
@@ -133,48 +139,6 @@ _TOOLS = [
 ]
 
 _ALL_TOOL_NAMES = {t.name for t in _TOOLS}
-
-# ─────────────────────────────────────────────────────────────────────────────
-# AGENT BUILDER  (LangChain 1.3 — create_agent)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _build_llm() -> ChatGroq:
-    return ChatGroq(
-        api_key=GROQ_API_KEY,
-        model=GROQ_MODEL,
-        temperature=0.1,
-        max_tokens=4096,
-    )
-
-
-def _build_agent(llm: ChatGroq):
-    """
-    Build a LangChain 1.3 agent using create_agent.
-    Returns a compiled LangGraph that accepts:
-      {"messages": [{"role": "user", "content": "..."}]}
-    """
-    system_text = _load_prompt_file("system_prompt.txt", _SYSTEM_PROMPT)
-
-    return create_agent(
-        model=llm,
-        tools=_TOOLS,
-        system_prompt=system_text,
-    )
-
-
-# ── Lazy singletons ───────────────────────────────────────────────────────────
-_llm:   Optional[ChatGroq] = None
-_agent                     = None   # compiled LangGraph
-
-
-def _get_agent():
-    global _llm, _agent
-    if _agent is None:
-        logger.info(f"Initialising Orion Alpha agent — model: {GROQ_MODEL}")
-        _llm   = _build_llm()
-        _agent = _build_agent(_llm)
-        logger.success(f"Agent ready. {len(_TOOLS)} tools registered: {[t.name for t in _TOOLS]}")
-    return _agent
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -213,28 +177,6 @@ def _extract_json(text: str) -> Optional[Dict[str, Any]]:
 
     logger.warning("Could not extract structured JSON from agent output.")
     return None
-
-
-def _parse_messages(messages: list) -> tuple[str, List[str]]:
-    """
-    Extract (raw_output, tool_calls_made) from the LangGraph message list.
-
-    - raw_output     : final AIMessage content string
-    - tool_calls_made: deduplicated list of tool names that were invoked
-    """
-    raw_output      = ""
-    tool_calls_made = []
-
-    for msg in messages:
-        # Collect tool names from AIMessage.tool_calls
-        if isinstance(msg, AIMessage):
-            raw_output = msg.content or ""          # last AIMessage wins
-            for tc in getattr(msg, "tool_calls", []):
-                name = tc.get("name") if isinstance(tc, dict) else getattr(tc, "name", None)
-                if name and name not in tool_calls_made:
-                    tool_calls_made.append(name)
-
-    return raw_output, tool_calls_made
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -295,35 +237,48 @@ def run_research(
     logger.info(f"[{research_id}] ── Orion Alpha research START: '{company_name}'")
 
     try:
-        agent  = _get_agent()
-        result = agent.invoke({
-            "messages": [{"role": "user", "content": human_input}]
-        })
+        tool_outputs: list[tuple[str, str]] = []
 
-        all_messages              = result.get("messages", [])
-        raw_output, tool_calls_made = _parse_messages(all_messages)
-        agent_steps               = len(tool_calls_made)
+        tool_outputs.append(("research_founder", _truncate_text(research_founder.invoke(company_name))))
+        tool_outputs.append(("research_funding", _truncate_text(research_funding.invoke(company_name))))
+        tool_outputs.append(("research_financials", _truncate_text(research_financials.invoke(company_name))))
+        tool_outputs.append(("research_market", _truncate_text(research_market.invoke(company_name))))
+
+        macro_input = sector_hint or company_name
+        tool_outputs.append(("research_macro_conditions", _truncate_text(research_macro_conditions.invoke(macro_input))))
+        tool_outputs.append(("research_news", _truncate_text(research_news.invoke(company_name))))
+
+        tool_calls_made = [name for name, _ in tool_outputs]
+        agent_steps = len(tool_calls_made)
 
         logger.info(
             f"[{research_id}] ── Research COMPLETE: {agent_steps} tool calls | "
             f"Tools: {tool_calls_made}"
         )
 
-        # Warn on skipped tools
-        skipped = _ALL_TOOL_NAMES - set(tool_calls_made)
-        if skipped:
-            logger.warning(
-                f"[{research_id}] ⚠ Tools NOT called (agent skipped): {sorted(skipped)}"
-            )
+        raw_output = "\n\n".join(
+            f"=== {name} ===\n{content}" for name, content in tool_outputs
+        )
 
-        parsed_recommendation = _extract_json(raw_output)
+        parsed_recommendation = generate_recommendation(
+            company_name=company_name,
+            raw_research=raw_output,
+        )
+
         if parsed_recommendation:
+            decision = parsed_recommendation.get("decision") or parsed_recommendation.get("verdict")
+            score = parsed_recommendation.get("confidence_score") or parsed_recommendation.get("composite_score")
             logger.success(
-                f"[{research_id}] Verdict: {parsed_recommendation.get('verdict')} | "
-                f"Score: {parsed_recommendation.get('composite_score')}"
+                f"[{research_id}] Verdict: {decision} | "
+                f"Score: {score}"
             )
         else:
             logger.warning(f"[{research_id}] Could not parse structured recommendation.")
+
+        all_messages = [
+            {"role": "tool", "name": name, "content": content}
+            for name, content in tool_outputs
+        ]
 
         return {
             "research_id":           research_id,
@@ -341,7 +296,7 @@ def run_research(
         }
 
     except Exception as exc:
-        logger.error(f"[{research_id}] Agent crashed", exc_info=True)
+        logger.error(f"[{research_id}] Research pipeline crashed", exc_info=True)
         return {
             "research_id":           research_id,
             "generated_at":          generated_at,
