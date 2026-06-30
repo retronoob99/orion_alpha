@@ -75,7 +75,7 @@ app.add_middleware(
 # ── Routers ───────────────────────────────────────────────────────────────────
 from api.routes.research import router as research_router   # noqa: E402
 
-app.include_router(research_router, prefix="/api/v1", tags=["Research"])
+app.include_router(research_router, prefix="/api/v1")
 
 # ── Health endpoint ───────────────────────────────────────────────────────────
 @app.get(
