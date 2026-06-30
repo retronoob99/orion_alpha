@@ -47,7 +47,7 @@ def _get_llm() -> ChatGroq:
         _llm = ChatGroq(
             api_key=GROQ_API_KEY,
             model=GROQ_MODEL,
-            temperature=0.1,
+            temperature=0.4,
             max_tokens=2048,
         )
     return _llm
@@ -78,9 +78,9 @@ SCORING WEIGHTS — apply these priorities when forming your assessment:
   • Recent news & momentum              : {w_news}% importance
 
 DECISION THRESHOLDS:
-  • INVEST  → Strong founder + large market + positive signals across most categories
-  • PASS    → Weak team, saturated market, poor financials, or major red flags
-  • WATCH   → Interesting but insufficient data, early traction, or mixed signals
+  • INVEST  → Net positive signals. Strong founder, good market size, or promising financials.
+  • PASS    → Net negative signals. Weak team, saturated market, poor financials, or major risks.
+  • WATCH   → USE RARELY. Only if the signals are perfectly split 50/50 and it is impossible to make a lean. You MUST try to lean INVEST or PASS.
 
 RESEARCH DATA:
 {raw_research}
@@ -88,14 +88,21 @@ RESEARCH DATA:
 OUTPUT RULES — CRITICAL:
 - Respond with ONLY a valid JSON object. No markdown. No code blocks. No extra text.
 - Use EXACTLY these keys: "decision", "confidence_score", "reasoning", "strengths", "risks"
-- "decision"        : exactly one of "INVEST", "PASS", or "WATCH" (uppercase, string)
-- "confidence_score": integer from 0 to 100
-- "reasoning"       : 2-3 sentence plain-English summary of your recommendation
-- "strengths"       : JSON array of 2-4 short strings (key positive signals)
-- "risks"           : JSON array of 2-4 short strings (key concerns or red flags)
+- "decision"         : exactly one of "INVEST", "PASS", or "WATCH" (uppercase, string)
+- "confidence_score" : integer from 0 to 100. This MUST vary based on the actual research quality. Do NOT default to 60.
+- "reasoning"        : 2-3 sentence summary that mentions {company_name} BY NAME and cites specific facts from the research.
+- "strengths"        : JSON array of 2-4 strings. EACH string MUST cite a SPECIFIC fact from the research data above.
+                       BANNED generic phrases: "strong founder", "large market", "compelling story", "significant growth", "positive signals".
+                       GOOD example: "Mark Zuckerberg built Facebook to 3B+ users with proven monetization via ads"
+                       BAD example: "Strong founder with a compelling story"
+                       If no specific positive facts exist in the research, return an empty array [].
+- "risks"            : JSON array of 2-4 strings. EACH string MUST cite a SPECIFIC concern from the research data above.
+                       BANNED generic phrases: "limited data", "unclear market", "competitive landscape", "lack of clear".
+                       GOOD example: "Meta faces antitrust lawsuits from FTC and EU regulators threatening forced divestiture of Instagram"
+                       BAD example: "Competitive landscape concerns"
+                       If no specific risk facts exist in the research, return an empty array [].
 
-Example format:
-{{"decision":"INVEST","confidence_score":72,"reasoning":"Strong repeat founder with prior exit in a large, growing market. Funding signals are positive and macro conditions are favourable for this sector.","strengths":["Serial founder with prior exit","$40B TAM with 18% YoY growth"],"risks":["No SEC filings — pre-revenue","Crowded competitive landscape"]}}"""
+REMEMBER: Every strength and risk MUST contain a specific name, number, fact, or data point from the research. Generic phrases will be rejected."""
 
 
 # ── JSON extractor ───────────────────────────────────────────────────────────
@@ -142,6 +149,13 @@ def generate_recommendation(company_name: str, raw_research: str) -> dict:
     """
     llm = _get_llm()
 
+    # Truncate to avoid Groq free-tier rate limits (6000 TPM)
+    # 6,000 chars ≈ 1,500 tokens for research + ~1,500 tokens for prompt template = ~3,000 total.
+    max_chars = 6000
+    if len(raw_research) > max_chars:
+        logger.warning(f"[{company_name}] Truncating research from {len(raw_research)} to {max_chars} chars")
+        raw_research = raw_research[:max_chars] + "\n\n...[TRUNCATED DUE TO LENGTH]..."
+
     prompt_text = _build_prompt(company_name, raw_research)
     logger.info(f"[{company_name}] Sending scoring prompt to {GROQ_MODEL} "
                 f"(research length: {len(raw_research)} chars)")
@@ -153,7 +167,9 @@ def generate_recommendation(company_name: str, raw_research: str) -> dict:
     messages = [
         SystemMessage(content=(
             "You are a pre-seed VC investment committee member. "
-            "You always respond with ONLY valid JSON. No markdown, no prose."
+            "You always respond with ONLY valid JSON. No markdown, no prose. "
+            "Every strength and risk you output MUST reference a specific fact, name, or number from the research data. "
+            "NEVER use generic phrases like 'strong founder' or 'large market' — always cite the actual data."
         )),
         HumanMessage(content=prompt_text),
     ]
