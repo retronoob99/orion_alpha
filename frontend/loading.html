@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORION ALPHA - Researching</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#002114",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#c8c6c5",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#858383",
+                    "tertiary-fixed": "#ffdad7",
+                    "on-surface-variant": "#444748",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb3ad",
+                    "on-tertiary-fixed-variant": "#852221",
+                    "surface-tint": "#5f5e5e",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#eeeeed",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "on-primary-fixed-variant": "#474746",
+                    "inverse-surface": "#2f3130",
+                    "surface-container-high": "#e8e8e7",
+                    "surface-container-low": "#f3f4f3",
+                    "secondary-fixed-dim": "#a5d0b9",
+                    "primary-fixed": "#e5e2e1",
+                    "secondary-container": "#beead1",
+                    "secondary": "#3f6653",
+                    "on-tertiary-fixed": "#410004",
+                    "tertiary": "#000000",
+                    "surface-dim": "#dadad9",
+                    "primary": "#000000",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-container": "#410004",
+                    "on-secondary-fixed-variant": "#274e3d",
+                    "inverse-on-surface": "#f1f1f0",
+                    "surface-bright": "#f9f9f8",
+                    "outline": "#747878",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface": "#1a1c1c",
+                    "surface": "#f9f9f8",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#c1ecd4",
+                    "on-error-container": "#93000a",
+                    "background": "#f9f9f8",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#1c1b1b",
+                    "primary-container": "#1c1b1b",
+                    "on-background": "#1a1c1c",
+                    "on-secondary-container": "#436b58",
+                    "outline-variant": "#c4c7c7",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#d65d57"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "margin-md": "32px",
+                    "container-max": "1440px",
+                    "margin-sm": "16px",
+                    "unit": "4px",
+                    "margin-lg": "48px"
+            },
+            "fontFamily": {
+                    "title-lg": [
+                            "Geist"
+                    ],
+                    "body-md": [
+                            "Geist"
+                    ],
+                    "label-md": [
+                            "Geist"
+                    ],
+                    "headline-md": [
+                            "Playfair Display"
+                    ],
+                    "display": [
+                            "Playfair Display"
+                    ],
+                    "headline-lg-mobile": [
+                            "Playfair Display"
+                    ],
+                    "body-lg": [
+                            "Geist"
+                    ],
+                    "headline-lg": [
+                            "Playfair Display"
+                    ],
+                    "mono-data": [
+                            "Geist"
+                    ]
+            },
+            "fontSize": {
+                    "title-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display": [
+                            "42px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "mono-data": [
+                            "13px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .progress-bar-container {
+            width: 100%;
+            height: 2px;
+            background-color: #E5E5E2;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #000000;
+            width: 0%;
+            animation: progress 90s linear forwards;
+        }
+
+        .step-label {
+            opacity: 0;
+            position: absolute;
+            transform: translateY(10px);
+            transition: all 0.3s ease-out;
+        }
+        
+        .step-label.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .step-label.exit {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            20% { width: 15%; }
+            40% { width: 45%; }
+            60% { width: 60%; }
+            80% { width: 85%; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background-color: #000000;
+            margin-left: 4px;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen flex flex-col overflow-hidden selection:bg-surface-variant selection:text-primary">
+<!-- Top Navigation (Shell suppressed due to transitional state intent, but minimal header retained for branding) -->
+<header class="flex justify-between items-center w-full px-margin-md h-16 max-w-container-max mx-auto absolute top-0 left-0 right-0 z-10 border-b border-outline-variant">
+<div class="font-display text-title-lg font-bold text-primary tracking-tight">ORION ALPHA</div>
+<button class="flex items-center justify-center w-8 h-8 rounded border border-outline-variant hover:bg-surface-container-high transition-colors" onclick="window.history.back()">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size: 18px;">close</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col items-center justify-center w-full px-margin-md max-w-[600px] mx-auto mt-16 relative">
+<!-- Minimal Grid Decoration -->
+<div class="absolute inset-0 pointer-events-none opacity-5" style="background-image: linear-gradient(#e5e2e1 1px, transparent 1px), linear-gradient(90deg, #e5e2e1 1px, transparent 1px); background-size: 40px 40px;"></div>
+<div class="w-full flex flex-col items-start space-y-12 z-10 bg-surface-container-lowest p-8 border border-outline-variant relative">
+<!-- Analysis Target Header -->
+<div class="w-full border-b border-outline-variant pb-6">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-2">Target Entity</p>
+<h1 class="font-display text-headline-md font-bold text-primary">Stripe, Inc.<span class="cursor-blink"></span></h1>
+
+</div>
+<!-- Progress Indicator Section -->
+<div class="w-full space-y-4">
+<div class="flex justify-between items-end">
+<div class="relative h-6 w-full overflow-hidden">
+<!-- Dynamic Labels Container -->
+<div class="relative w-full h-full font-body-md text-body-md text-primary flex items-center" id="status-labels">
+<span class="step-label active" data-step="0">Initializing research terminal...</span>
+<span class="step-label" data-step="1">Pulling funding history...</span>
+<span class="step-label" data-step="2">Checking SEC filings...</span>
+<span class="step-label" data-step="3">Scoring macro conditions...</span>
+<span class="step-label" data-step="4">Analyzing founder network...</span>
+<span class="step-label" data-step="5">Compiling final dossier...</span>
+</div>
+</div>
+<span class="font-mono-data text-mono-data text-on-surface-variant min-w-[3ch] text-right" id="progress-percentage">0%</span>
+</div>
+<!-- Linear Progress Bar -->
+<div class="progress-bar-container">
+<div class="progress-bar-fill" id="progress-bar"></div>
+</div>
+</div>
+<!-- Static Metric Placeholders (to establish context of what is being built) -->
+<div class="w-full grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant opacity-40">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Data Points</span>
+<span class="font-mono-data text-mono-data text-primary animate-pulse">Gathering...</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Confidence Score</span>
+<span class="font-mono-data text-mono-data text-primary animate-pulse">Calculating...</span>
+</div>
+</div>
+</div>
+</main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const labels = document.querySelectorAll('.step-label');
+    const totalTime = 90000; // 90 seconds timeout max
+    const numSteps = labels.length;
+    const timePerStep = totalTime / numSteps;
+    
+    let currentStep = 0;
+    let isFinished = false;
+
+    const updateLabels = () => {
+        if (isFinished || currentStep >= numSteps) return;
+
+        labels.forEach((label, index) => {
+            if (index === currentStep) {
+                label.classList.add('active');
+                label.classList.remove('exit');
+            } else if (index < currentStep) {
+                label.classList.remove('active');
+                label.classList.add('exit');
+            } else {
+                label.classList.remove('active', 'exit');
+            }
+        });
+        
+        currentStep++;
+        if (currentStep < numSteps) {
+            setTimeout(updateLabels, 8000 / numSteps); // Rotate faster than 90s for visuals
+        }
+    };
+    setTimeout(updateLabels, 500);
+
+    const progressBar = document.getElementById('progress-bar');
+    const percentageText = document.getElementById('progress-percentage');
+    let startTime = null;
+    
+    const updatePercentage = (timestamp) => {
+        if (isFinished) return;
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        
+        // Progress goes up to 99% over 90 seconds
+        const progress = Math.min(elapsed / 90000, 0.99);
+        
+        let displayPercentage = Math.floor(progress * 100);
+        percentageText.textContent = `${displayPercentage}%`;
+        
+        // Fix css animation to match 90s
+        progressBar.style.animationDuration = '90s';
+
+        if (progress < 1) {
+            requestAnimationFrame(updatePercentage);
+        }
+    };
+    requestAnimationFrame(updatePercentage);
+
+    // Update Company Name
+    const query = sessionStorage.getItem('searchQuery') || 'Unknown Entity';
+    const h1 = document.querySelector('h1');
+    h1.innerHTML = `${query}<span class="cursor-blink"></span>`;
+
+    // API Call
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 90000);
+
+        fetch('http://localhost:8000/api/v1/research/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ company_name: query }),
+        signal: controller.signal
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Network error or server unavailable');
+        return res.json();
+    })
+    .then(data => {
+        clearTimeout(timeoutId);
+        isFinished = true;
+        percentageText.textContent = '100%';
+        progressBar.style.width = '100%';
+        progressBar.style.animation = 'none';
+        
+        const activeLabel = document.querySelector('.step-label.active');
+        if(activeLabel) activeLabel.textContent = "Research complete. Redirecting...";
+        
+        sessionStorage.setItem('researchResult', JSON.stringify(data));
+        
+        try {
+            let history = JSON.parse(localStorage.getItem('orionHistory') || '[]');
+            history = history.filter(item => item.company_name !== data.company_name);
+            history.unshift(data);
+            if (history.length > 10) history.pop();
+            localStorage.setItem('orionHistory', JSON.stringify(history));
+        } catch (e) {
+            console.error("Could not save to history", e);
+        }
+
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 500);
+    })
+    .catch(err => {
+        clearTimeout(timeoutId);
+        isFinished = true;
+        progressBar.style.animationPlayState = 'paused';
+        percentageText.textContent = 'ERR';
+        percentageText.classList.add('text-error');
+        percentageText.style.color = '#ba1a1a';
+        
+        const labelsContainer = document.getElementById('status-labels');
+        labelsContainer.innerHTML = `<span class="step-label active" style="opacity: 1; transform: translateY(0); color: #ba1a1a;">Error: ${err.name === 'AbortError' ? 'Request timed out' : err.message}</span>`;
+    });
+});
+</script>
+</body></html>

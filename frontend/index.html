@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orion Alpha - Research Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#002114",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#858383",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-surface-variant": "#444748",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-tertiary-fixed-variant": "#852221",
+                        "surface-tint": "#5f5e5e",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeed",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-primary-fixed-variant": "#474746",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e7",
+                        "surface-container-low": "#f3f4f3",
+                        "secondary-fixed-dim": "#a5d0b9",
+                        "primary-fixed": "#e5e2e1",
+                        "secondary-container": "#beead1",
+                        "secondary": "#3f6653",
+                        "on-tertiary-fixed": "#410004",
+                        "tertiary": "#000000",
+                        "surface-dim": "#dadad9",
+                        "primary": "#000000",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-container": "#410004",
+                        "on-secondary-fixed-variant": "#274e3d",
+                        "inverse-on-surface": "#f1f1f0",
+                        "surface-bright": "#f9f9f8",
+                        "outline": "#747878",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f8",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#c1ecd4",
+                        "on-error-container": "#93000a",
+                        "background": "#f9f9f8",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#1c1b1b",
+                        "primary-container": "#1c1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#436b58",
+                        "outline-variant": "#c4c7c7",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#d65d57"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "0px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-md": "32px",
+                        "container-max": "1440px",
+                        "margin-sm": "16px",
+                        "unit": "4px",
+                        "margin-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Playfair Display"],
+                        "display": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Geist"],
+                        "headline-lg": ["Playfair Display"],
+                        "mono-data": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display": ["42px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "mono-data": ["13px", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #F9F9F8;
+            color: #1a1c1c;
+        }
+        /* Custom focused input style to override default tailwind forms ring */
+        input:focus {
+            outline: none;
+            box-shadow: none;
+            border-color: #000000;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-background text-on-background selection:bg-surface-variant selection:text-primary">
+<main class="w-full max-w-[640px] px-margin-md flex flex-col items-center text-center">
+<div class="mb-margin-lg">
+<h1 class="font-display text-display text-primary mb-2">Orion Alpha</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Pre-seed investment research terminal.</p>
+</div>
+<div class="w-full relative">
+<form action="#" class="w-full" method="GET">
+<input autocomplete="off" autofocus="" class="w-full bg-surface-container-lowest border border-outline-variant font-body-lg text-body-lg text-primary placeholder:text-outline p-4 rounded-none transition-colors duration-200 focus:border-primary focus:ring-0" name="q" placeholder="Enter a company name or URL" type="text"/>
+</form>
+<div class="mt-4 flex flex-wrap justify-center gap-2" id="recent-container">
+<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container-low border border-outline-variant px-2 py-1 uppercase tracking-wider">Recent:</span>
+<!-- dynamically populated from localStorage -->
+</div>
+</div>
+</main>
+<footer class="absolute bottom-margin-md w-full text-center">
+<p class="font-mono-data text-mono-data text-outline-variant">System Status: Nominal | Terminal v2.4.1</p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const query = document.querySelector('input[name="q"]').value.trim();
+        if (query) {
+            sessionStorage.setItem('searchQuery', query);
+            window.location.href = 'loading.html';
+        }
+    });
+    const recentContainer = document.getElementById('recent-container');
+    try {
+        const history = JSON.parse(localStorage.getItem('orionHistory') || '[]');
+        if (history.length > 0) {
+            recentContainer.innerHTML = '<span class="font-label-md text-label-md text-on-surface-variant bg-surface-container-low border border-outline-variant px-2 py-1 uppercase tracking-wider">Recent:</span>';
+            history.forEach(item => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'font-label-md text-label-md text-primary bg-surface-container-lowest border border-outline-variant px-2 py-1 uppercase hover:bg-surface-container-low transition-colors';
+                btn.textContent = item.company_name || 'Unknown';
+                btn.addEventListener('click', () => {
+                    sessionStorage.setItem('researchResult', JSON.stringify(item));
+                    window.location.href = 'dashboard.html';
+                });
+                recentContainer.appendChild(btn);
+            });
+        }
+    } catch (e) {
+        console.error("Error loading history", e);
+    }
+});
+</script>
+</body>
+</html>

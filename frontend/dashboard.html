@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Research Terminal - Orion Alpha</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#002114",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#c8c6c5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#858383",
+                        "tertiary-fixed": "#ffdad7",
+                        "on-surface-variant": "#444748",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "on-tertiary-fixed-variant": "#852221",
+                        "surface-tint": "#5f5e5e",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#eeeeed",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "on-primary-fixed-variant": "#474746",
+                        "inverse-surface": "#2f3130",
+                        "surface-container-high": "#e8e8e7",
+                        "surface-container-low": "#f3f4f3",
+                        "secondary-fixed-dim": "#a5d0b9",
+                        "primary-fixed": "#e5e2e1",
+                        "secondary-container": "#beead1",
+                        "secondary": "#3f6653",
+                        "on-tertiary-fixed": "#410004",
+                        "tertiary": "#000000",
+                        "surface-dim": "#dadad9",
+                        "primary": "#000000",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-container": "#410004",
+                        "on-secondary-fixed-variant": "#274e3d",
+                        "inverse-on-surface": "#f1f1f0",
+                        "surface-bright": "#f9f9f8",
+                        "outline": "#747878",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f8",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#c1ecd4",
+                        "on-error-container": "#93000a",
+                        "background": "#f9f9f8",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed": "#1c1b1b",
+                        "primary-container": "#1c1b1b",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-container": "#436b58",
+                        "outline-variant": "#c4c7c7",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#d65d57"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-md": "32px",
+                        "container-max": "1440px",
+                        "margin-sm": "16px",
+                        "unit": "4px",
+                        "margin-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Playfair Display"],
+                        "display": ["Playfair Display"],
+                        "headline-lg-mobile": ["Playfair Display"],
+                        "body-lg": ["Geist"],
+                        "headline-lg": ["Playfair Display"],
+                        "mono-data": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["18px", { "lineHeight": "1.5", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display": ["42px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "mono-data": ["13px", { "lineHeight": "1", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .border-layer-1 {
+            border-color: #E5E5E2;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen font-body-md text-body-md">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface font-title-lg text-title-lg docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center w-full px-margin-md h-16 max-w-container-max mx-auto">
+<div class="flex items-center gap-margin-sm">
+<span class="font-display text-headline-md font-bold text-primary dark:text-on-primary-fixed tracking-tight">ORION ALPHA</span>
+</div>
+<nav class="hidden md:flex items-center gap-margin-sm h-full">
+<a class="h-full flex items-center text-primary dark:text-on-primary-fixed border-b-2 border-primary dark:border-on-primary-fixed pb-1 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 ease-in-out px-4" href="#">Portfolio</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 ease-in-out text-primary dark:text-on-primary-fixed">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors duration-200 ease-in-out text-primary dark:text-on-primary-fixed">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden max-w-container-max mx-auto w-full">
+<!-- SideNavBar -->
+<aside class="hidden md:flex bg-surface-container-low dark:bg-surface-container-lowest font-label-md text-label-md uppercase tracking-wider docked left-0 h-full w-64 border-r border-outline-variant dark:border-outline flat no shadows flex flex-col h-screen p-4 gap-2">
+<div class="mb-margin-sm p-4">
+<h2 class="font-display text-title-lg font-bold text-primary dark:text-on-primary-fixed">Research Terminal</h2>
+<p class="text-on-surface-variant dark:text-outline-variant mt-1">Pre-seed Analyst Tool</p>
+</div>
+<button class="mb-margin-sm w-full py-3 px-4 bg-primary text-on-primary border border-primary hover:bg-surface-variant hover:text-primary transition-all duration-150">
+                New Analysis
+            </button>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">groups</span> Founders
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary dark:bg-primary-fixed text-on-primary dark:text-on-primary-fixed hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">payments</span> Funding
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">analytics</span> Financials
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">query_stats</span> Market
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">public</span> Macro
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">newspaper</span> News
+                </a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-layer-1 pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">help</span> Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-high dark:hover:bg-surface-container hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-all duration-150" href="#">
+<span class="material-symbols-outlined">code</span> API
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto p-gutter md:p-margin-md bg-background">
+<!-- Dashboard Header -->
+<div class="mb-margin-md pb-margin-sm border-b border-layer-1 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+<div>
+<div class="flex items-center gap-4 mb-2">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary m-0">Solaris Robotics</h1>
+<span class="inline-block px-2 py-1 bg-secondary/10 border border-secondary text-secondary font-label-md text-label-md uppercase tracking-wider">
+                            Verdict: Invest
+                        </span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Industrial automation solutions leveraging proprietary AI models.</p>
+</div>
+<!-- Confidence Score -->
+<div class="w-full md:w-64">
+<div class="flex justify-between items-end mb-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Conviction Score</span>
+<span class="font-mono-data text-mono-data text-primary font-bold">84/100</span>
+</div>
+<div class="h-1 bg-surface-variant w-full">
+<div class="h-full bg-primary" style="width: 84%;"></div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-margin-md">
+<!-- Strengths -->
+<div class="md:col-span-6 bg-surface-container-lowest border border-layer-1 p-6">
+<h3 class="font-title-lg text-title-lg text-primary mb-4 border-b border-layer-1 pb-2">Key Strengths</h3>
+<ul class="space-y-3 font-body-md text-body-md text-on-surface">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">add</span>
+<span>Founder track record in industrial automation; previous exit to Siemens.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">add</span>
+<span>Proprietary dataset established through early pilot partnerships.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">add</span>
+<span>Clear regulatory pathway for primary product line.</span>
+</li>
+</ul>
+</div>
+<!-- Risks -->
+<div class="md:col-span-6 bg-surface-container-lowest border border-layer-1 p-6">
+<h3 class="font-title-lg text-title-lg text-primary mb-4 border-b border-layer-1 pb-2">Identified Risks</h3>
+<ul class="space-y-3 font-body-md text-body-md text-on-surface">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">remove</span>
+<span>High capital intensity required for hardware prototyping phase.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">remove</span>
+<span>Dependencies on specific semiconductor supply chains.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">remove</span>
+<span>Extended sales cycles typical of heavy industry clients.</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Detailed Section -->
+<div id="detailed-section" class="bg-surface-container-lowest border border-layer-1">
+<div class="p-6 border-b border-layer-1 flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-primary m-0">Funding Summary</h3>
+<button class="px-4 py-2 bg-surface-container-lowest border border-layer-1 text-primary font-label-md text-label-md hover:bg-inverse-on-surface transition-colors">
+                        Export Data
+                    </button>
+</div>
+<div id="funding-content" class="overflow-x-auto">
+<!-- Will be dynamically replaced by JS -->
+<div class="p-6 text-on-surface-variant italic">Loading funding data...</div>
+</div>
+<div class="p-4 text-right border-t border-layer-1">
+<span id="source-info" class="font-label-md text-label-md text-outline-variant">Source: Orion Alpha Research</span>
+</div>
+</div>
+</main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const rawData = sessionStorage.getItem('researchResult');
+    if (!rawData) return;
+    
+    try {
+        const result = JSON.parse(rawData);
+        const rec = result.recommendation;
+        
+        // 1. Company Name
+        const headerH1 = document.querySelector('h1');
+        if (headerH1) headerH1.textContent = result.company_name || 'Unknown';
+        
+        // 2. Verdict
+        const verdictSpan = document.querySelector('h1').parentElement.querySelector('span');
+        if (verdictSpan && rec) {
+            verdictSpan.textContent = `Verdict: ${rec.verdict}`;
+            verdictSpan.className = 'inline-block px-2 py-1 font-label-md text-label-md uppercase tracking-wider border';
+            if (rec.verdict === 'INVEST') {
+                verdictSpan.classList.add('bg-secondary/10', 'border-secondary', 'text-secondary');
+            } else if (rec.verdict === 'PASS') {
+                verdictSpan.classList.add('bg-error/10', 'border-error', 'text-error');
+            } else {
+                verdictSpan.classList.add('bg-surface-variant', 'border-outline', 'text-on-surface-variant');
+            }
+        }
+        
+        // 3. Summary
+        const summaryP = document.querySelector('h1').parentElement.nextElementSibling;
+        if (summaryP && summaryP.tagName === 'P' && rec) {
+            summaryP.textContent = rec.one_line;
+        }
+        
+        // 4. Confidence Score
+        const scoreSpan = document.querySelector('.font-mono-data.text-primary.font-bold');
+        if (scoreSpan && rec) {
+            const score = Math.round(rec.composite_score * 10);
+            scoreSpan.textContent = `${score}/100`;
+            const scoreBar = document.querySelector('.h-1.bg-surface-variant .bg-primary');
+            if (scoreBar) scoreBar.style.width = `${score}%`;
+        }
+        
+        // 5. Strengths
+        const strengthsList = document.querySelectorAll('ul.space-y-3')[0];
+        if (strengthsList && rec && rec.bull_case) {
+            if (rec.bull_case.length > 0) {
+                strengthsList.innerHTML = rec.bull_case.map(s => `
+                    <li class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">add</span>
+                        <span>${s}</span>
+                    </li>
+                `).join('');
+            } else {
+                strengthsList.innerHTML = '<li class="text-on-surface-variant italic">No distinct strengths identified from available data.</li>';
+            }
+        }
+        
+        // 6. Risks
+        const risksList = document.querySelectorAll('ul.space-y-3')[1];
+        if (risksList && rec && rec.bear_case) {
+            if (rec.bear_case.length > 0) {
+                risksList.innerHTML = rec.bear_case.map(r => `
+                    <li class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[16px] mt-0.5">remove</span>
+                        <span>${r}</span>
+                    </li>
+                `).join('');
+            } else {
+                risksList.innerHTML = '<li class="text-on-surface-variant italic">No distinct risks identified from available data.</li>';
+            }
+        }
+        
+        // Helper: convert raw tool output into clean formatted HTML
+        const formatResearch = (rawText) => {
+            if (!rawText || rawText === 'No data available.') {
+                return '<p class="text-on-surface-variant italic">No data available for this section.</p>';
+            }
+            
+            // Remove internal markers
+            let cleaned = rawText
+                .replace(/^===.*===\s*/gm, '')
+                .replace(/^-{10,}\s*/gm, '')
+                .replace(/^\[LIVE WEB RESEARCH.*?\]\s*/gm, '')
+                .replace(/^\[INDEXED DATA.*?\]\s*/gm, '')
+                .replace(/^\[Web Summary\]\s*/gm, '')
+                .replace(/^\[Source \d+\].*?\n.*?\n/gm, '')  // Remove source headers + URLs
+                .replace(/^https?:\/\/\S+\s*/gm, '')         // Remove bare URLs on their own line
+                .trim();
+            
+            if (!cleaned) {
+                return '<p class="text-on-surface-variant italic">No data available for this section.</p>';
+            }
+
+            // Split into meaningful paragraphs
+            const paragraphs = cleaned.split(/\n{2,}/).filter(p => p.trim().length > 10);
+            
+            // Build bullet points from paragraphs
+            let html = '<ul class="space-y-4">';
+            for (const para of paragraphs) {
+                // Split long paragraphs into sentences for sub-bullets
+                const sentences = para.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 5);
+                if (sentences.length <= 2) {
+                    html += `<li class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-[16px] mt-1 shrink-0">arrow_right</span>
+                        <span>${para.trim()}</span>
+                    </li>`;
+                } else {
+                    // First sentence as main point, rest as context
+                    html += `<li class="flex items-start gap-2">
+                        <span class="material-symbols-outlined text-primary text-[16px] mt-1 shrink-0">arrow_right</span>
+                        <div>
+                            <span class="font-medium">${sentences[0].trim()}</span>
+                            <span class="text-on-surface-variant"> ${sentences.slice(1).join(' ').trim()}</span>
+                        </div>
+                    </li>`;
+                }
+            }
+            html += '</ul>';
+            return html;
+        };
+
+        const tabContent = {
+            'Founders': { title: 'Founders Research', content: formatResearch(result.founder?.raw_summary) },
+            'Funding': { title: 'Funding Research', content: formatResearch(result.funding?.raw_summary) },
+            'Financials': { title: 'Financials Research', content: formatResearch(result.financials?.raw_summary) },
+            'Market': { title: 'Market Research', content: formatResearch(result.market?.raw_summary) },
+            'Macro': { title: 'Macro Research', content: formatResearch(result.macro?.raw_summary) },
+            'News': { title: 'Recent News', content: formatResearch(result.news?.raw_summary) },
+            'Detailed Research': { 
+                title: 'Detailed Research & Reasoning', 
+                content: `<div class="mb-4">
+                            <h4 class="font-title-lg text-title-lg mb-2 text-primary">Reasoning</h4>
+                            <p>${rec?.full_reasoning || 'No data available.'}</p>
+                          </div>`
+            }
+        };
+
+        // Build a dynamic funding summary card from the structured data
+        const buildFundingSummary = () => {
+            const f = result.funding;
+            if (!f) return '<p class="text-on-surface-variant italic">No funding data available.</p>';
+            
+            let html = '<div class="p-6 space-y-4">';
+            
+            // Summary stats row
+            html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">';
+            
+            if (f.total_raised_usd) {
+                const raised = f.total_raised_usd >= 1e9 
+                    ? `$${(f.total_raised_usd / 1e9).toFixed(1)}B`
+                    : f.total_raised_usd >= 1e6 
+                        ? `$${(f.total_raised_usd / 1e6).toFixed(1)}M`
+                        : `$${(f.total_raised_usd / 1e3).toFixed(0)}K`;
+                html += `<div class="bg-surface-container-low p-4 border border-layer-1">
+                    <span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-1">Total Raised</span>
+                    <span class="font-mono-data text-[18px] font-bold text-primary">${raised}</span>
+                </div>`;
+            }
+            
+            if (f.last_round_stage && f.last_round_stage !== 'unknown') {
+                html += `<div class="bg-surface-container-low p-4 border border-layer-1">
+                    <span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-1">Last Round</span>
+                    <span class="font-mono-data text-[18px] font-bold text-primary">${f.last_round_stage.replace('-', ' ').toUpperCase()}</span>
+                </div>`;
+            }
+
+            if (f.num_rounds) {
+                html += `<div class="bg-surface-container-low p-4 border border-layer-1">
+                    <span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-1">Rounds</span>
+                    <span class="font-mono-data text-[18px] font-bold text-primary">${f.num_rounds}</span>
+                </div>`;
+            }
+
+            html += `<div class="bg-surface-container-low p-4 border border-layer-1">
+                <span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-1">Crunchbase Match</span>
+                <span class="font-mono-data text-[18px] font-bold ${f.crunchbase_match ? 'text-secondary' : 'text-on-surface-variant'}">${f.crunchbase_match ? 'Yes' : 'No'}</span>
+            </div>`;
+            
+            html += '</div>';
+            
+            // Investors
+            if (f.investors && f.investors.length > 0) {
+                html += '<div class="mb-4"><span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-2">Known Investors</span>';
+                html += '<div class="flex flex-wrap gap-2">';
+                f.investors.forEach(inv => {
+                    html += `<span class="px-3 py-1 bg-surface-container-high border border-layer-1 text-on-surface font-body-md">${inv}</span>`;
+                });
+                html += '</div></div>';
+            }
+
+            // Detailed research below
+            if (f.raw_summary) {
+                html += '<div class="border-t border-layer-1 pt-4">';
+                html += '<span class="font-label-md text-label-md text-on-surface-variant uppercase block mb-2">Detailed Findings</span>';
+                html += formatResearch(f.raw_summary);
+                html += '</div>';
+            }
+
+            html += '</div>';
+            return html;
+        };
+
+        // Populate funding section on page load  
+        const fundingContainer = document.getElementById('funding-content');
+        if (fundingContainer) {
+            fundingContainer.innerHTML = buildFundingSummary();
+        }
+
+        const bottomSection = document.getElementById('detailed-section');
+
+        const renderTab = (tabKey) => {
+            if (!bottomSection) return;
+            const heading = bottomSection.querySelector('h3');
+            if (heading) heading.textContent = tabContent[tabKey].title;
+            
+            const contentArea = document.getElementById('funding-content');
+            if (contentArea) {
+                contentArea.innerHTML = `
+                    <div class="p-6 font-body-md text-body-md text-on-surface space-y-6">
+                        ${tabContent[tabKey].content}
+                    </div>
+                `;
+            }
+        };
+
+        // Default: show funding summary (already rendered above)
+
+        // Wiring up the sidebar nav links
+        const navLinks = document.querySelectorAll('aside nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Remove active styling from all links
+                navLinks.forEach(l => {
+                    l.classList.remove('bg-primary', 'dark:bg-primary-fixed', 'text-on-primary', 'dark:text-on-primary-fixed');
+                    l.classList.add('text-on-surface-variant', 'dark:text-outline-variant');
+                });
+                
+                // Add active styling to clicked link
+                link.classList.remove('text-on-surface-variant', 'dark:text-outline-variant');
+                link.classList.add('bg-primary', 'dark:bg-primary-fixed', 'text-on-primary', 'dark:text-on-primary-fixed');
+                
+                // Render corresponding tab content
+                const tabName = link.textContent.trim().split(' ').pop();
+                if (tabName === 'Funding') {
+                    // Restore the dynamic funding summary
+                    const heading = bottomSection.querySelector('h3');
+                    if (heading) heading.textContent = 'Funding Summary';
+                    const contentArea = document.getElementById('funding-content');
+                    if (contentArea) contentArea.innerHTML = buildFundingSummary();
+                } else if (tabContent[tabName]) {
+                    renderTab(tabName);
+                }
+            });
+        });
+        
+        // "New Analysis" button -> go back to search
+        const newAnalysisBtn = document.querySelector('aside button');
+        if (newAnalysisBtn) {
+            newAnalysisBtn.addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        }
+
+        // 8. Timestamp & page title
+        document.title = `${result.company_name} - Research Terminal`;
+        const sourceSpan = document.getElementById('source-info');
+        if (sourceSpan && result.generated_at) {
+            sourceSpan.textContent = `Generated: ${result.generated_at} | Source: Orion Alpha Research`;
+        }
+        
+    } catch (e) {
+        console.error("Error mapping data", e);
+    }
+});
+</script>
+</body>
+</html>
